@@ -1,0 +1,10 @@
+prototype NUMBER CompanyListDialog();
+function NUMBER CompanyListDialog()
+begin
+end;
+
+// control identifiers
+#define RES_PBUT_NEXT 1
+#define RES_PBUT_BACK 12
+#define RES_PBUT_CANCEL 9
+#define RES_DIALOG_LISTBOX 1388

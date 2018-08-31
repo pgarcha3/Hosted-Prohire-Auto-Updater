@@ -1,0 +1,302 @@
+//////////////////////////////////////////////////////////////////////
+/////////////////////////////// Summary //////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+		Features:  			        13
+		Components:			        17
+		Number of Files:		        40
+		Size of Files:   		      21797865
+		Size in Library:		      15925535
+
+
+		<Support>
+			Engine
+				Log
+				Kernel
+			Main Installation
+				Script
+				Setup
+				StrTbl
+				RunTime
+				Resource
+		<Data>
+			Disk<1>
+			DefaultFeature
+
+
+//////////////////////////////////////////////////////////////////////
+///////////////////////////// Features ///////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+*<Support>*
+
+		Component
+		------------------------------------------------------
+
+*<Support>\Engine*
+
+		Component
+		------------------------------------------------------
+
+*<Support>\Engine\Log*
+
+		Component
+		------------------------------------------------------
+
+*<Support>\Engine\Kernel*
+
+		Component
+		------------------------------------------------------
+		"<Engine>Kernel Placeholder"
+		"<Engine>EngineCommonPlaceHolderSelfReg"
+
+*<Support>\Main Installation*
+
+		Component
+		------------------------------------------------------
+
+*<Support>\Main Installation\Script*
+
+		Component
+		------------------------------------------------------
+		"<Support>Script"
+
+*<Support>\Main Installation\Setup*
+
+		Component
+		------------------------------------------------------
+		"<Support>Language Independent OS Independent Files"
+		"<Support>0x0409 OS Independent Files"
+		"<Support>Build Generated Support Files"
+		"<Support>Misc Support Files"
+		"<Support>Misc i64 Support Files"
+		"<Support>Misc x64 Support Files"
+
+*<Support>\Main Installation\StrTbl*
+
+		Component
+		------------------------------------------------------
+		"<Support>0x0409 String Tables"
+
+*<Support>\Main Installation\RunTime*
+
+		Component
+		------------------------------------------------------
+		"<Support>Non-SelfRegistering"
+
+*<Support>\Main Installation\Resource*
+
+		Component
+		------------------------------------------------------
+		"<Support>0x0409 Files"
+
+*<Data>*
+
+		Component
+		------------------------------------------------------
+
+*<Data>\Disk<1>*
+
+		Component
+		------------------------------------------------------
+		"<Disk1>Disk1 Files(1)"
+		"<Disk1>Disk1 Files(2)"
+		"<Disk1>Disk1 Files(3)"
+		"<Disk1>Disk1 Files(4)"
+
+*<Data>\DefaultFeature*
+
+		Component
+		------------------------------------------------------
+		"DefaultComponent"
+
+
+//////////////////////////////////////////////////////////////////////
+///////////////////////////// Components ////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+><Engine>Kernel Placeholder<
+
+		Size of Files:   		             0
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+
+><Engine>EngineCommonPlaceHolderSelfReg<
+
+		Size of Files:   		             0
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+
+><Support>Script<
+
+		Size of Files:   		        282459
+		Size in Library:		        282459
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+		"setup.inx"                                             16/04/2018     12:56:12       282459  ""                 "A"           "4833504bb71a40fd2e21f3640ccfa73e"      "p:\prohire\install shield projects\my installations\install shield 2010 projects\hosted prohire auto updater\script files\setup.inx"
+
+><Support>Language Independent OS Independent Files<
+
+		Size of Files:   		         11493
+		Size in Library:		          2605
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+		"license.rtf"                                           28/11/2004     10:52:18        11493  ""                 "A"           "e7eb45e877c8cb80f56e9dbc9504e757"      "c:\program files (x86)\installshield\2010\redist\0409\license.rtf"
+
+><Support>0x0409 OS Independent Files<
+
+		Size of Files:   		             0
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+
+><Support>Build Generated Support Files<
+
+		Size of Files:   		           125
+		Size in Library:		            99
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+		"fontdata.ini"                                          16/04/2018     12:56:16           39  ""                 "A"           "00f313e3e007599349a0c4d81c7807c4"      "c:\users\pgarcha\appdata\local\temp\fontdata.ini"
+		"difxdata.ini"                                          16/04/2018     12:56:16           86  ""                 "A"           "10baa5b67536f4433f37534b9c8bb828"      "c:\users\pgarcha\appdata\local\temp\difxdata.ini"
+
+><Support>Misc Support Files<
+
+		Size of Files:   		         76583
+		Size in Library:		         17909
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+		"corecomp.ini"                                          07/03/2006     00:55:04        65503  ""                 "A"           "09d38ceca6a012f4ce5b54f03db9b21a"      "c:\program files (x86)\installshield\2010\redist\language independent\i386\corecomp.ini"
+		"dotnetinstaller.exe"                                   10/06/2009     15:57:52        11080  "16.0.0.328"       "A"           "94b6f434210bfad6abdcf818b8cf350f"      "c:\program files (x86)\installshield\2010\redist\language independent\i386\dotnetinstaller.exe"
+
+><Support>Misc i64 Support Files<
+
+		Size of Files:   		        239416
+		Size in Library:		        103979
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+		"isbew64.exe"                                           10/06/2009     15:59:18       239416  "16.0.0.328"       "A"           "38eb6c08e3e7e385255119c8c732fa99"      "c:\program files (x86)\installshield\2010\redist\language independent\i64\isbew64.exe"
+
+><Support>Misc x64 Support Files<
+
+		Size of Files:   		        107320
+		Size in Library:		         52026
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+		"isbew64.exe"                                           10/06/2009     15:59:18       107320  "16.0.0.328"       "A"           "41cb698f967b4d9f2580ea2a21a5a710"      "c:\program files (x86)\installshield\2010\redist\language independent\x64\isbew64.exe"
+
+><Support>0x0409 String Tables<
+
+		Size of Files:   		           623
+		Size in Library:		           293
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+		"stringtable_0x0409.ips"                                16/04/2018     12:56:12          623  ""                 "A"           "7d0c6a52bda4cbfd3a3537be918621d2"      "p:\prohire\install shield projects\my installations\install shield 2010 projects\hosted prohire auto updater\string tables\stringtable_0x0409.ips"
+
+><Support>Non-SelfRegistering<
+
+		Size of Files:   		        262592
+		Size in Library:		        253568
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+		"isrt.dll"                                              22/09/2009     02:08:46       261424  "16.0.0.400"       "A"           "ed5aa645392883b21507c8d097fda277"      "c:\program files (x86)\installshield\2010\redist\language independent\i386\isrt.dll"
+		"default.pal"                                           07/03/2006     00:55:02         1168  ""                 "A"           "0abafe3f69d053494405061de2629c82"      "c:\program files (x86)\installshield\2010\redist\language independent\i386\default.pal"
+
+><Support>0x0409 Files<
+
+		Size of Files:   		        565355
+		Size in Library:		        119358
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+		"_isuser_0x0409.dll"                                    16/04/2018     12:56:12        12288  ""                 "A"           "a8e7c73187cd0e0c7124a414241f4cc3"      "p:\prohire\install shield projects\my installations\install shield 2010 projects\hosted prohire auto updater\_isuser_0x0409.dll"
+		"_isres_0x0409.dll"                                     10/06/2009     15:16:34       553067  "16.0.0.328"       "A"           "8938d3d18b09e92eeb9c403593365eb0"      "c:\program files (x86)\installshield\2010\redist\language independent\i386\_isres_0x0409.dll"
+
+><Disk1>Disk1 Files(1)<
+
+		Size of Files:   		             0
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+		"layout.bin"                                            28/11/2004     11:32:10            0  ""                 "A"           "d41d8cd98f00b204e9800998ecf8427e"      "c:\program files (x86)\installshield\2010\support\build\layout.bin"
+		"data1.hdr"                                             28/11/2004     11:32:10            0  ""                 "A"           "d41d8cd98f00b204e9800998ecf8427e"      "c:\program files (x86)\installshield\2010\support\build\data1.hdr"
+		"data1.cab"                                             28/11/2004     11:32:10            0  ""                 "A"           "d41d8cd98f00b204e9800998ecf8427e"      "c:\program files (x86)\installshield\2010\support\build\data1.cab"
+
+><Disk1>Disk1 Files(2)<
+
+		Size of Files:   		       1401334
+		Size in Library:		       1401334
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+		"setup.exe"                                             16/04/2018     12:56:16       802816  "16.0.0.400"       "A"           "07c90b494645f1a143d934139f49264a"      "p:\prohire\install shield projects\my installations\install shield 2010 projects\hosted prohire auto updater\media\hosted_autoupdater\disk images\disk1\setup.exe"
+		"issetup.dll"                                           22/09/2009     02:08:46       577024  "16.0.0.400"       ""            "1bf0fc52d41be3f3c1025b3971bc49a0"      "p:\prohire\install shield projects\my installations\install shield 2010 projects\hosted prohire auto updater\media\hosted_autoupdater\disk images\disk1\issetup.dll"
+		"0x0409.ini"                                            21/05/2009     16:53:56        21494  ""                 "A"           "36affbd6ff77d1515cfc1c5e998fbaf9"      "p:\prohire\install shield projects\my installations\install shield 2010 projects\hosted prohire auto updater\media\hosted_autoupdater\disk images\disk1\0x0409.ini"
+
+><Disk1>Disk1 Files(3)<
+
+		Size of Files:   		        282459
+		Size in Library:		        282459
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+		"setup.inx"                                             16/04/2018     12:56:12       282459  ""                 "A"           "4833504bb71a40fd2e21f3640ccfa73e"      "p:\prohire\install shield projects\my installations\install shield 2010 projects\hosted prohire auto updater\script files\setup.inx"
+
+><Disk1>Disk1 Files(4)<
+
+		Size of Files:   		          1225
+		Size in Library:		          1225
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+		"setup.ini"                                             16/04/2018     12:56:16         1225  ""                 "A"           "6cd8454d44c1508e9b9b8495f42e8028"      "p:\prohire\install shield projects\my installations\install shield 2010 projects\hosted prohire auto updater\media\hosted_autoupdater\disk images\disk1\setup.ini"
+
+>DefaultComponent<
+
+		Size of Files:   		      18566881
+		Size in Library:		      13408221
+
+
+		File                                                    Date        Time         Size         Version            Attributes    MD5                                     Source file
+		------------------------------------------------------  ----------  -----------  -----------  -----------------  ------------  --------------------------------------  ------------------------------------------------
+		"killprocess.exe"                                       20/04/2017     15:26:54        16384  ""                 "A"           "ef6c6af59dec7ec6c59973cd99ff2fea"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\autoupdate\killprocess.exe"
+		"curl-ca-bundle.crt"                                    16/12/2015     12:58:36       260290  ""                 "A"           "b88690b1b7e535ec0218d3d710605837"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\install\curl\curl-ca-bundle.crt"
+		"curl.exe"                                              16/12/2015     12:19:10      2803200  "7.46.0.0"         "A"           "a73fc7432a9fe84bbb6e238c62cb9fc8"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\install\curl\curl.exe"
+		"prohireservershutdowntool.exe"                         19/06/2008     16:27:30        90112  ""                 "A"           "b64a80423060cd1f798deada61408936"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\install\prohireservershutdowntool.exe"
+		"comerr32.dll"                                          13/04/2009     13:23:00        12288  "1.6.3.16"         "A"           "87352e8f6a4c18df7f99bbde61f84f59"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\install\psql_bin\comerr32.dll"
+		"gssapi32.dll"                                          13/04/2009     13:23:00       135168  "1.6.3.16"         "A"           "20b5c88c2e48ee2ef9713a38e9b779a7"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\install\psql_bin\gssapi32.dll"
+		"k5sprt32.dll"                                          13/04/2009     13:23:00        19968  "1.6.3.16"         "A"           "960054d7b055009ababefc972c4ba3a7"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\install\psql_bin\k5sprt32.dll"
+		"krb5_32.dll"                                           13/04/2009     13:23:00       634880  "1.6.3.16"         "A"           "ba0093dcda4d0b299ee2be305a978abd"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\install\psql_bin\krb5_32.dll"
+		"libeay32.dll"                                          15/02/2010     14:50:06      1032192  "0.9.8.12"         "A"           "6e3c38dc189524115ebe232a048e26c1"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\install\psql_bin\libeay32.dll"
+		"libiconv-2.dll"                                        06/01/2009     15:51:00       968886  "1.12.0.0"         "A"           "205c285cb7f954e472ab601d3617e93a"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\install\psql_bin\libiconv-2.dll"
+		"libintl-8.dll"                                         06/01/2009     15:51:00        83906  "0.17.0.0"         "A"           "2e7938bffda0b32a45900d8281163a30"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\install\psql_bin\libintl-8.dll"
+		"libpq.dll"                                             12/03/2010     14:25:44       172032  "8.4.3.1070"       "A"           "13f64c6d5c18244c0c70a81a8d622ac5"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\install\psql_bin\libpq.dll"
+		"msvcr71.dll"                                           08/04/2008     15:13:22       348160  "7.10.3052.4"      "A"           "86f1895ae8c5e8b17d99ece768a70732"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\install\psql_bin\msvcr71.dll"
+		"psql.exe"                                              12/03/2010     14:26:16       323584  "8.4.3.1070"       "A"           "44cb4becfcf96ff5c4046059ad21313b"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\install\psql_bin\psql.exe"
+		"ssleay32.dll"                                          15/02/2010     14:50:06       212992  "0.9.8.12"         "A"           "2a9c5f1d6630ab9528ed96b4248143b1"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\install\psql_bin\ssleay32.dll"
+		"prohireclient.exe"                                     12/04/2018     15:43:46     11452839  "16.0.0.400"       "A"           "6c80f443250a828fe4c09674d5f7f3dc"      "p:\prohire\prohirev3 & v4 install setup files\prohirev4.5\launcher\prohirefiles\prohireclientreplacer\prohireclient.exe"

@@ -1,0 +1,235 @@
+
+/*
+  STRING REPLACEMENT MODULE
+  Rev:  2-26-1999   Submitted to InstallSite
+        3-12-1999   Correct defect: infinite loop when subject string contains
+                        2 or more contiguous occurrences of search string.
+
+  by James Frater
+
+_StrReplace(...) :
+
+  String replacement fully supports the replacement including the value
+  you are replacing without resulting in an infinite loop.
+
+  Several supporting routines are provided so that _StrReplace will
+  compile and be usable in its submitted form.  So that some of these
+  ancillary routines would not be "lonely," some of their siblings even
+  though they are not all necessary for _StrReplace.
+
+  This source is provided as-is, with no support or warantee whatsoever.
+
+  That said, it has been unit tested and functions correctly in
+    a production product release, where it really counts.
+*/
+
+
+
+/*
+    Substring the right-most nLength characters of szString & load into svSubStr.
+    Just like BASIC RIGHT$ function
+*/
+function _Right ( svSubStr, szString, nLength )
+LONG  nStart;
+begin
+  nStart = StrLength (szString) - nLength;
+  //SprintfBox (SEVERE, "",
+  //             "StrLength (svSubStr)=%ld\n\nStrLength (szString)=%ld\n\nnStart=%ld",
+  //              StrLength (svSubStr), StrLength (szString), nStart );
+  StrSub (svSubStr, szString, nStart, nLength);
+end;  // function _Right
+
+
+
+/*
+    Substring the left-most nLength characters of szString & load into svSubStr.
+    Just like BASIC LEFT$ function
+*/
+/*function _Left ( svSubStr, szString, nLength )
+begin
+  StrSub (svSubStr, szString, 0, nLength);
+end; */ // function _Left
+
+
+
+/*
+    Remove leading spaces from svString.
+    Just like BASIC LTRIM$ function
+*/
+/*function _LTrim ( svString )
+begin
+  _StrStripLeading ( svString, " " );
+end;*/
+
+
+
+/*
+    Remove trailing spaces from svString.
+    Just like BASIC RTRIM$ function
+*/
+/*function _RTrim ( svString )
+begin
+  _StrStripTrailing ( svString, " " );
+end;*/
+
+
+
+/*
+    Remove leading and trailing spaces from svString.
+    Just like BASIC TRIM$ function
+*/
+/*function _Trim ( svString )
+begin
+  _StrStripLeading ( svString, " " );
+  _StrStripTrailing ( svString, " " );
+end;*/
+
+
+
+// String all svChar from left side of svRes.
+// If svChar = "" just strip 1st char.
+// If len svChar > 1, 1st char used
+function _StrStripLeading ( svRes, svChar )
+
+STRING  svTemp;
+LONG    lRemSize, lLeftOver;
+
+begin
+    if StrLength ( svRes ) <= 0 then
+        return -1;
+    endif;
+
+    if svChar = "" then
+        lRemSize = 1;
+    else
+        lRemSize = 0;
+        while (    ( svRes [lRemSize] = svChar [0]  )
+                && ( lRemSize < StrLength ( svRes ) )
+              )
+            lRemSize++;
+        endwhile;
+    endif;
+
+    lLeftOver = StrLength ( svRes ) - lRemSize;
+    StrSub ( svTemp, svRes, lRemSize, lLeftOver );
+    svRes = svTemp;
+end;    // function _StrStripLeading
+
+
+
+// Just like _StrStripLeading, but remove from the right
+//  side of string instead
+function _StrStripTrailing ( svRes, svChar )
+
+STRING  svTemp;
+LONG    lPos, lNewSiz, lsvResLen;
+
+begin
+    lsvResLen = StrLength ( svRes );
+
+    if lsvResLen <= 0 then
+        return -1;
+    endif;
+
+    if svChar = "" then
+        lNewSiz = lsvResLen - 1;
+    else
+        lNewSiz = lsvResLen;
+        lPos = lsvResLen - 1;
+        while (    ( svRes [lPos] = svChar [0]  )
+                && ( lPos > 0 )
+              )
+            lPos--;
+            lNewSiz--;
+        endwhile;
+    endif;
+
+    StrSub ( svTemp, svRes, 0, lNewSiz );
+    svRes = svTemp;
+end;    // function _StrStripTrailing
+
+
+
+/*
+  Just like IS API StrFind func, except search starts in position lStart.
+  Specifying lStart = 0 gives identical behavior to StrFind
+*/
+
+function _StrFind ( svBase, svFind, lStart )
+
+LONG    lTempResult;
+STRING  svSub[1024];
+
+begin
+  //SprintfBox ( SEVERE, "", "StrLength (svBase) = %ld\nsvFind = '%s'\nlStart = %ld",
+  //                StrLength (svBase),svFind,lStart);
+  _Right ( svSub, svBase, StrLength (svBase) - lStart );
+  lTempResult = StrFind ( svSub, svFind );
+  if lTempResult >= 0 then
+    lTempResult = lTempResult + lStart;
+  endif;
+  return lTempResult;
+end;    // function _StrFind
+
+
+
+/*
+In svResult, replace all occurrences of svFind with svRepl.
+Function return is always 0.
+
+Example replacing all occurrences:
+    _StrReplace ( svResult, "%DSN%", svDSN, glOccurrences, MAX_STRING );
+    SprintfBox ( INFORMATION, "_StrReplace",
+                  "%ld occurrences were replaced.", glOccurrences );
+
+Example replacing at most the first two occurrences:
+    lNumRepls = 2;
+    _StrReplace ( svResult, "professional wrestler",
+                  "The Honerable Jesse Ventura, Governor of Minnesota",
+                  glOccurrences, lNumRepls );
+
+*/
+function _StrReplace ( svRes, svFind, svRepl, lOccurrences, lMaxOcc )
+
+LONG    lFindPos, lRightBegPos, lRightSiz;
+//LONG    lStrLenBefore, lStrLenAfter;
+STRING  svTempLeft, svTempRight, svTmpRes;
+begin
+    lOccurrences = 0;
+    //lStrLenBefore = StrLength (svRes);
+    svTmpRes = svRes;
+    // while svFind occurs in svTmpRes, replace it with svRepl
+    lFindPos = StrFind (svTmpRes, svFind );
+    while ( lFindPos >= 0 ) && ( lOccurrences < lMaxOcc )
+        lOccurrences++;
+        StrSub ( svTempLeft, svTmpRes, 0, lFindPos );
+
+        lRightBegPos = lFindPos + StrLength ( svFind );
+
+        // Using this diagram, length of svTempRight must be total length of
+        //  string minus length of svTempLeft minus length of svFind:
+        //  <--svTempLeft--><--svFind--><--svTempRight-->
+        lRightSiz    = StrLength ( svTmpRes )
+                        - StrLength ( svTempLeft )
+                        - StrLength ( svFind );
+        StrSub ( svTempRight, svTmpRes, lRightBegPos, lRightSiz );
+
+        svTmpRes = svTempLeft + svRepl + svTempRight;
+
+        // Any more occurrences?
+        lFindPos = _StrFind ( svTmpRes, svFind, lFindPos + StrLength ( svRepl ) );
+    endwhile;
+
+    // $ errror 401 this line, string not lg enough ?!
+    //lStrLenAfter = StrLength ( svTmpRes );
+    //SprintfBox ( INFORMATION, "StrLength before and after", "%d\n%d",
+    //                lStrLenBefore, lStrLenAfter);
+    svRes = svTmpRes;
+    return 0;
+end;  // function _StrReplace
+
+
+
+
+
+

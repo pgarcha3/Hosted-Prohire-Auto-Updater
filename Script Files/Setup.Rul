@@ -1,0 +1,1079 @@
+
+////////////////////////////////////////////////////////////////////////////////
+//                                                                            
+//   File Name:   Setup.rul                                                   
+//                                                                            
+//   Description: InstallShield script                                        
+//                                                                            
+//   Comments:    This script was generated based on the selections you made in
+//                the Project Wizard.  Refer to the help topic entitled "Modify      
+//                the script that the Project Wizard generates" for information
+//                on possible next steps.   ...
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+// Include header files
+    
+#include "ifx.h"
+#include "_StrReplace.h"
+#include "_StrReplace.rul"
+#include "CustomDialog.rul"
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           
+//  FUNCTION:   OnFirstUIBefore                                            
+//                                                                           
+//  EVENT:      FirstUIBefore event is sent when installation is run for the first
+//              time on given machine. In the handler installation usually displays
+//              UI allowing end user to specify installation parameters. After this
+//              function returns, ComponentTransferData is called to perform file
+//              transfer.
+//                                                                           
+///////////////////////////////////////////////////////////////////////////////
+function OnFirstUIBefore()
+    number  nFileSrvApp, nResult, nLevel,nvSize, nSetupType, nHostedExportExists, nHostedExportLocked, nvFileCompaniesCSVHandle;
+    number	nIsFileServerLocked, nvLineNumber, nNumFiles, nvLineNum, nvFileHandle, nvFileHandleToBeCopied, nvFileDBEngine01CompaniesCSVHandle;
+    number	nvFileDBEngine02CompaniesCSVHandle, nPort, nvPort, nIcon, nFlag, nCreateShortCuts, nProhireFileServer, nRunningFileServersFileHandle;
+    number	nProhireApp, nProhireClient, nvFileProhireClientOrProhireAppHandle, nProhireClientGrep, nvDBENGINE01Result, nStrCompare;
+    number	nvFileCompanyNameDBENGINE01Handle, nvFileCompanyNameDBENGINE02Handle, nvDBENGINE02Result, nNumProhireClientFiles, nNumProhireAppFiles;
+    number	nvMultiDBUpdaterPathReturnLine, nvFileServerPathReturnLine, nvFileSelectQueryHandle, nvFileSelectConnectHandle, nvFileHandleProhireClientCopyBatchFile;
+    number	nFileHandle, nvResult, nvFileHandleLogFile, nvFileHandleCompanyPathFile, nvFileHandleKillFileServer, nYesNoResult, nFileHandlelistProhireClientFiles;
+    number	nvSelectQueryOuputFileHandle, nControl, nSubCommand, nvFileUpdateQueryHandle, nvFileUpdateConnectHandle, nCaseSelectResult, nvFileSelectQueryOuputHandle;
+    number	nvIsProhireRunningFileHandle, nvMultiDbUpdaterCSVFileHandle, nvAppServerNameLineNumber, nvFileSelectGetCompanyNamesQueryHandle, nServerImagesFolderExistsResult;
+    number	nGetCompanyPortNumbersQueryOutputFileHandle, nGetCompanyNamesQueryOutputFileHandle, nDatabaseBackupResult, nvMultiDBUpdaterErrorLineNumber, nvType;
+    number	nvUpdatesPathReturnLine, nvRepositoryRootLineNumber, nvFirebirdDBPathLineNumber, nvFileInsertQueryHandle, nvFileInsertConnectHandle, nProhireClientExistsURLFolder;
+    number  nvPinNumberFileHandle, nvSelectGetPinNumberQueryConnectHandle, nvFileSelectGetPinNumberQueryHandle, nvFileSelectGetPinNumberQueryOuputHandle;
+    number	nSelectGetCompanyPortNumbersQueryFileHandle;
+    
+    string  szItemName1, szProgram, szTitle, szMsg, szProhireInstall, szTargetPath, szDir, szComponents, szTargetdir, svReturnLine, svProhireServerShutDownTool;
+    string	svNumFiles, svReturnString, svPath, svLine, svVersionNumber, svClientFolde, svMultiDBUpdaterPathr, svFileServerFileName, svProhireClientFilesLine;
+    STRING	szFileSrvApp, svResultDATE, svClientFolder, svMultiDBUpdaterPath, svMONTH, svDAY, svYEAR, svUKDATE, svString, szFolderDir, svCompanyNames, svCompanyName;
+    STRING	svMatchingFileName, szProgramFolder, szItemName, szCommandLine, szWorkingDir, szIconPath, szShortCutKey, svRunningFileServersPath, szDialogName, svAppServerName;
+    string	svProhirAppFileName, svProhirClientFileName, svProhireClient, svlistCompanyNameDBENGINE01Line, svlistCompanyNameDBENGINE02Line, svProhireClientPath;
+    string	svNumProhireClientFiles, svNumProhireAppFiles, svFileServerFilePath, svlistProhireClientOrProhireApp, svProhireCientOrApp, svFileServer, svProhireServerVersionNumber;
+    string	svMultiDBUpdaterPathReturnLine, svFileServerPathReturnLine, svMatchingProhireAppFileName, szSrcFile, szTargetFile, svUpdateFolder, svServerPortNumber;
+    string	svIsProhireRunningResultsLine, svAppServerNameReturnLine, svSelectGetCompanyNamesQuery, svAppSrvPortNumber, svMultiDBUpdaterErrorReturnLine, svAppServerVersion;
+    string	svResultTIME, svHH, svMM, svSS, svFullTime, szKey, szName, svComputerName, svUpdatesPathReturnLine, svRepositoryRootReturnLine, svFirebirdDBPathReturnLine;
+    string	svFirebirdDBPathDriveLetter, svProhireClientVersionNumber, svIsProhireRunningAfterUpdateResultsLine, svPinNumber; 
+    
+    BOOL	bDone, bSelected;
+    
+    LIST	listCompanyNameList, listFileForDBENGINE01, listFileForDBENGINE02, listCompanyNameDBENGINE02, listDATE, listTIME;
+    LIST	listRunningFileServerFiles, listProhireClientFiles, listID, listButtons, listDescription, listAppServersList, listPortNumbers;
+    
+      HWND hwndDlg;
+
+begin 
+
+//**********************************************************************************************************
+//      FORMAT THE DATE & TIME FROM 'GETSYSTEMINFO()'.  DATE IS CONVERTED FROM MM-DD-YYYY TO BE DD-MM-YYYY
+//      THE TIME IS CONVERTED FROM HH:MM:SS TO BE HH-MM-SS.
+//**********************************************************************************************************
+
+GetSystemInfo (TIME, nvResult, svResultTIME);   // GET THE SYSTEM TIME 
+GetSystemInfo (DATE, nvResult, svResultDATE);   // GET THE SYSTEM DATE
+
+//PUT THE TIME IN TO A LIST & SEPERATE IT
+listTIME = ListCreate (STRINGLIST);
+StrGetTokens (listTIME, svResultTIME, ":");
+
+//GET EACH ITEM FROM THE LIST
+ListGetFirstString(listTIME,svHH);
+ListGetNextString(listTIME,svMM);
+ListGetNextString(listTIME,svSS);
+
+//FORMAT THE STRING TO INCLUDE '-' AS THE SEPERATER RATHER THEN THEN ':'
+svFullTime = svHH+"-"+svMM+"-"+svSS;
+
+//PUT THE DATE IN TO A LIST & SEPERATE IT
+listDATE = ListCreate (STRINGLIST);
+StrGetTokens (listDATE, svResultDATE, "-");
+
+//GET EACH ITEM FROM THE LIST
+ListGetFirstString(listDATE,svMONTH);
+ListGetNextString(listDATE,svDAY);
+ListGetNextString(listDATE,svYEAR);
+
+//FORMATE THE STRING TO BE A DATE IN UK FORMAT
+svUKDATE = svDAY+"-"+svMONTH+"-"+svYEAR; 
+
+//DELETE THE LISTS FROM MEMORY AS THEY ARE NO LONGER NEEDED
+ListDestroy(listTIME);
+ListDestroy(listDATE);
+
+//GET THE LOCAL MACHINE NAME FROM THE REGISTRY TO MAKE SURE THIS OPTION IN RUN ON THE ACTUAL APP SERVER
+     szKey = "System\\CurrentControlSet\\Control\\ComputerName\\ComputerName";
+     szName = "ComputerName";
+     RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE); 
+
+     // Set the default root
+     RegDBGetKeyValueEx(szKey, szName, nvType, svComputerName, nvSize);          
+
+ 
+//*************************************************************************************************
+// 									ALL VARIABLES - TESTING
+//*************************************************************************************************	
+/*
+#define psqlExe "\""+TARGETDIR^"\\psql.exe\""
+#define FarmDatabaseName "ProhireFarm"
+#define	FarmSchemaName "prohire_farm"  
+#define FarmDatabaseHost "10.0.0.90" 
+#define	FarmDatabasePort "5432" 
+#define	FarmDatabaseUserName "postgres"
+#define	FarmDatabaseUserNamePassword "password" 
+#define svWebDotConfigFile "\\\\10.0.0.45\\c\\Inetpub\\wwwroot\\IISController\\Web.config"
+#define HTTPHeaderString "http://10.0.0.45/Prohire/Farm/"
+#define CURL_EXE TARGETDIR ^ "curl.exe"
+#define KILL_PROCESS_EXE TARGETDIR ^ "KillProcess.exe"
+
+//MULTI DB UPDATER DEFINITIONS 
+#define MultiDBUpdaterEXE			svMultiDBUpdaterPathReturnLine+"MultiDbUpdater.exe"
+#define MultiDBUpdaterLogFile		svMultiDBUpdaterPathReturnLine+"MultiDbUpdater.log"
+#define MultiDBUpdaterCompaniesCSV	svMultiDBUpdaterPathReturnLine+"companies.csv" 
+#define MultiDBUpdaterIniFile		svMultiDBUpdaterPathReturnLine+"MultiDbUpdater.ini" 
+
+//LOOP DATABASE BACKUP FOR WHEN UPDATING WHOLE APP SERVER
+#define DATABASE_FILE svFirebirdDBPathReturnLine
+#define DATABASE_FILE_BACKUP svFirebirdDBPathReturnLine+"."+svCompanyName+"."+svAppServerVersion+".Backup."+svUKDATE+"."+svFullTime
+
+//SINGLE COMPANY DATABASE BACKUP
+#define DATABASE_FILE_SINGLE_COMPANY svFirebirdDBPathReturnLine
+#define	DATABASE_FILE_SINGLE_COMPANY_BACKUP svFirebirdDBPathReturnLine+"."+svCompanyName+"."+svAppServerVersion+".Backup."+svUKDATE+"."+svFullTime
+
+#define UPDATE_FOLDER_PROHIRE_SERVER svUpdateFolder+"\\ProhireServer.exe"
+
+#define PROHIRE_LUNCH_APP "C:\\ProhireAgent\\ProhireLaunchApp.exe"
+
+#define PROHIRE_CLIENT_PATH svFileServerPathReturnLine+"Launcher\\ProhireFiles\\ProhireClient.exe"
+#define PROHIRE_CLIENT_PATH_FOR_URL_LINK "\\\\10.0.0.45\\c\\Websites\\prohirev3.tripoint.co.uk\\ProhireClients\\"+svProhireServerVersionNumber+"\\ProhireClient.exe"
+
+#define SHUT_DOWN_TOOL TARGETDIR+"ProhireServerShutDownTool.exe"
+
+#define FILE_SERVER_PATH svFileServerPathReturnLine+"Launcher\\Server\\"+svCompanyName+"_FileServer.exe"
+
+//PIN NUMBER TXT FILE CALLED SOMETHING RANDOM!!
+#define PIN_NUMBER_FILE_PATH svFileServerPathReturnLine+"Launcher\\ProhireFiles"
+
+#define PROHIRE_CLIENT_REPLACER TARGETDIR+"ProhireClient.exe"   
+
+*/
+//*************************************************************************************************
+// 									ALL VARIABLES - LIVE
+//*************************************************************************************************		
+
+#define psqlExe "\""+TARGETDIR^"\\psql.exe\""
+#define FarmDatabaseName "ProhireFarm"
+#define	FarmSchemaName "prohire_farm" 
+#define FarmDatabaseHost "192.168.16.41"
+#define	FarmDatabasePort "5434"
+#define	FarmDatabaseUserName "postgres"
+#define	FarmDatabaseUserNamePassword "postgres"
+#define svWebDotConfigFile "\\\\192.168.16.31\\c$\\Inetpub\\wwwroot\\IISController\\Web.config"
+#define HTTPHeaderString "http://192.168.16.31/Prohire/Farm/"
+#define CURL_EXE TARGETDIR ^ "curl.exe"
+#define KILL_PROCESS_EXE TARGETDIR ^ "KillProcess.exe"
+
+//MULTI DB UPDATER DEFINITIONS 
+#define MultiDBUpdaterEXE			svMultiDBUpdaterPathReturnLine+"MultiDbUpdater.exe"
+#define MultiDBUpdaterLogFile		svMultiDBUpdaterPathReturnLine+"MultiDbUpdater.log"
+#define MultiDBUpdaterCompaniesCSV	svMultiDBUpdaterPathReturnLine+"companies.csv" 
+#define MultiDBUpdaterIniFile		svMultiDBUpdaterPathReturnLine+"MultiDbUpdater.ini" 
+
+//LOOP DATABASE BACKUP FOR WHEN UPDATING WHOLE APP SERVER
+#define DATABASE_FILE svFirebirdDBPathReturnLine
+#define DATABASE_FILE_BACKUP svFirebirdDBPathReturnLine+"."+svCompanyName+"."+svAppServerVersion+".Backup."+svUKDATE+"."+svFullTime
+
+//SINGLE COMPANY DATABASE BACKUP
+#define DATABASE_FILE_SINGLE_COMPANY svFirebirdDBPathReturnLine
+#define	DATABASE_FILE_SINGLE_COMPANY_BACKUP svFirebirdDBPathReturnLine+"."+svCompanyName+"."+svAppServerVersion+".Backup."+svUKDATE+"."+svFullTime
+
+#define UPDATE_FOLDER_PROHIRE_SERVER svUpdateFolder+"\\ProhireServer.exe"
+
+#define PROHIRE_LUNCH_APP "C:\\ProhireAgent\\ProhireLaunchApp.exe"
+
+#define PROHIRE_CLIENT_PATH svFileServerPathReturnLine+"\\Launcher\\ProhireFiles\\ProhireClient.exe"
+#define PROHIRE_CLIENT_PATH_FOR_URL_LINK "\\\\192.168.16.11\\c$\\Websites\\prohirev3.tripoint.co.uk\\ProhireClients\\"+svProhireServerVersionNumber+"\\ProhireClient.exe"
+
+#define SHUT_DOWN_TOOL TARGETDIR+"ProhireServerShutDownTool.exe"
+#define FILE_SERVER_PATH svFileServerPathReturnLine+"Launcher\\Server\\"+svCompanyName+"_FileServer.exe" 
+
+//PIN NUMBER TXT FILE CALLED SOMETHING RANDOM!!
+#define PIN_NUMBER_FILE_PATH svFileServerPathReturnLine+"Launcher\\ProhireFiles"
+
+#define PROHIRE_CLIENT_REPLACER TARGETDIR+"ProhireClient.exe"   
+
+//LOG FILE
+#define Log_File TARGETDIR^"LogFile.txt"
+#define SECTION "HostedAutoUpdate"
+#define KEY_VALUE_PASSED "PASSED"
+#define KEY_VALUE_FAILED "FAILED"
+#define KEY_VALUE_YES "YES"
+#define KEY_VALUE_NO "NO"
+//*************************************************************************************************
+//									GET ALL NEEDED DATA FROM LB-01/WEB.CONFIG                       
+//*************************************************************************************************
+
+// FIRST COPY THE 'WEB.CONFIG' FILE FROM LB-01 ==> LOCALLY
+ if (XCopyFile (svWebDotConfigFile, "C:\\", COMP_NORMAL) <0) then
+ 	MessageBox("Setup failed to copy "+svWebDotConfigFile+"\nTo C:\\\nYou need to fix this to carry on\nClick OK to exit",SEVERE);
+ 	exit;
+ endif;
+ 
+ //GET THE FIREBIRD PATH
+if (FileGrep ("C:\\web.config", "<FirebirdDBPath>", svFirebirdDBPathReturnLine, nvFirebirdDBPathLineNumber, RESTART) <0) then
+	MessageBox("Setup failed to get the '<FirebirdDBPath>' path from web.config\nYou need to fix this to carry on\nClick OK to exit",SEVERE);
+	exit;
+else
+ _StrReplace (svFirebirdDBPathReturnLine, "<FirebirdDBPath>", "", glOccurrences, 1); 
+ _StrReplace (svFirebirdDBPathReturnLine, "</FirebirdDBPath>","", glOccurrences, 1);
+ //GET THE DRIVE LETTER FROM THE PATH - NEEDED WHEN FORMING THE MultiDBUpdaterCompaniesCSV DB PATH
+ParsePath (svFirebirdDBPathDriveLetter, svFirebirdDBPathReturnLine, DISK);
+_StrReplace (svFirebirdDBPathDriveLetter, ":", "", glOccurrences, 1); 
+endif;
+ 
+  //GET THE $UpdatesPath
+if (FileGrep ("C:\\web.config", "<$UpdatesPath>", svUpdatesPathReturnLine, nvUpdatesPathReturnLine, RESTART) <0) then
+	MessageBox("Setup failed to get the '<$UpdatesPath>' path from web.config\nYou need to fix this to carry on\nClick OK to exit",SEVERE);
+	exit;
+else
+ _StrReplace (svUpdatesPathReturnLine, "<$UpdatesPath>", "", glOccurrences, 1); 
+ _StrReplace (svUpdatesPathReturnLine, "</$UpdatesPath>","",glOccurrences, 1);
+ 
+   _StrStripLeading (svUpdatesPathReturnLine, " ");
+  _StrStripTrailing (svUpdatesPathReturnLine, " ");	
+endif;
+ 
+ //GET THE MultiDBUpdaterPath
+if (FileGrep ("C:\\web.config", "<MultiDBUpdaterPath>", svMultiDBUpdaterPathReturnLine, nvMultiDBUpdaterPathReturnLine, RESTART) <0) then
+	MessageBox("Setup failed to get the '<MultiDBUpdaterPath>' path from web.config\nYou need to fix this to carry on\nClick OK to exit",SEVERE);
+	exit;
+else
+ _StrReplace (svMultiDBUpdaterPathReturnLine, "<MultiDBUpdaterPath>", "", glOccurrences, 1); 
+ _StrReplace (svMultiDBUpdaterPathReturnLine, "</MultiDBUpdaterPath>","",glOccurrences, 1);
+ 
+   _StrStripLeading (svMultiDBUpdaterPathReturnLine, " ");
+  _StrStripTrailing (svMultiDBUpdaterPathReturnLine, " ");	
+endif;
+
+//GET THE FileServerPath <FileServerPath>G:\PHRepository\FileServers\{1}\</FileServerPath>
+if (FileGrep ("C:\\web.config", "<FileServerPath>", svFileServerPathReturnLine, nvFileServerPathReturnLine, RESTART) <0) then
+	MessageBox("Setup failed to get the '<FileServerPath>' path from web.config\nYou need to fix this to carry on\nClick OK to exit",SEVERE);
+	exit;
+else
+ _StrReplace (svFileServerPathReturnLine, "<FileServerPath>", "", glOccurrences, 1); 
+ _StrReplace (svFileServerPathReturnLine, "</FileServerPath>", "", glOccurrences, 1);
+                                                                          
+   _StrStripLeading (svFileServerPathReturnLine, " ");
+  _StrStripTrailing (svFileServerPathReturnLine, " ");	
+endif;
+
+//GET THE REPOITORY ROOT => ServerImages 
+if (FileGrep ("C:\\web.config", "<RepositoryRoot>", svRepositoryRootReturnLine, nvRepositoryRootLineNumber, RESTART) <0) then
+	MessageBox("Setup failed to get the '<RepositoryRoot>' path from web.config\nYou need to fix this to carry on\nClick OK to exit",SEVERE);
+	exit;
+else
+ _StrReplace (svRepositoryRootReturnLine, "<RepositoryRoot>", "", glOccurrences, 1); 
+ _StrReplace (svRepositoryRootReturnLine, "</RepositoryRoot>","", glOccurrences, 1);
+
+   _StrStripLeading (svRepositoryRootReturnLine, " ");
+  _StrStripTrailing (svRepositoryRootReturnLine, " ");
+endif;
+
+//*************************************************************************************************
+// 						SET TARGETDIR
+//*************************************************************************************************	
+Dlg_Start:
+
+//ASSGIN TARGETDIR VAR 
+TARGETDIR = svUpdatesPathReturnLine;
+    
+//CLEAN UP BEFORE RUNNING
+DeleteFile (TARGETDIR+"*.bat");
+DeleteFile (TARGETDIR+"*.txt");
+DeleteFile (TARGETDIR+"*.exe");
+DeleteFile (TARGETDIR+"*.dll");
+
+// CREATE LOG FILE
+OpenFileMode (FILE_MODE_APPEND);    
+CreateFile (nvFileHandleLogFile, TARGETDIR, "LogFile.txt");
+
+Dlg_SdWelcome:
+    szTitle = "";
+    szMsg = "";
+    nResult = SdWelcome( szTitle, szMsg );
+    if (nResult = BACK) goto Dlg_Start;  
+
+//ASK FOR THE PATH WHERE THE UPDATES ARE
+Dlg_SdAskDestPathForUpdateFolder:
+	svUpdateFolder = "G:\\$Updates\\$4.11";
+	
+	SdAskDestPath ("Update Foler", "Browse to the Update Folder", svUpdateFolder, 0);
+	if (nResult = BACK) goto Dlg_SdWelcome;
+
+WriteProfString (Log_File, SECTION, "UPDATE PATH", svUpdateFolder); 	
+
+//GET ProhireServer VERSION VERSION NUMBER
+if (VerGetFileVersion (UPDATE_FOLDER_PROHIRE_SERVER, svProhireServerVersionNumber) < 0) then
+ MessageBox("Unable to get ProhireServer.exe Version number from "+svUpdateFolder,INFORMATION);  
+ exit;
+else
+//SET THE SERVER IMAGES PATH
+  _StrReplace (svRepositoryRootReturnLine, "{0}", svProhireServerVersionNumber, glOccurrences, 1); 
+endif;
+
+// CREATE BATCH  FILE    
+CreateFile (nvFileHandleProhireClientCopyBatchFile, TARGETDIR, "ProhireClientCopyBatchFile.bat"); 	    
+
+ //**************************************************************************************
+ //				SET THE 'TARGETDIR' TO VARIABLE 'szProhireInstall'
+ //**************************************************************************************
+
+ // setup default status
+    SetStatusWindow(0, "");
+    Enable(STATUSEX);
+    StatusUpdate(ON, 100);
+
+//****************************************************************************************
+//									UNPACK ALL THE FILES.... 
+//****************************************************************************************
+FeatureSetTarget (MEDIA, TARGETDIR, TARGETDIR);    
+FeatureUpdate("");
+FeatureTransferData (MEDIA);
+
+//*********************************************************************************************************
+//									SELECT UPDATE TYPE
+//********************************************************************************************************* 
+
+  // CREATE THE SelectConnect.bat FILE THAT WILL HAVE THE CONNECTION STRING FOR THE SELECT QUERY
+	OpenFileMode(FILE_MODE_APPEND);
+		CreateFile(nvFileSelectConnectHandle, TARGETDIR, "SelectQueryConnect.bat");
+		WriteLine (nvFileSelectConnectHandle, "SET PGPASSWORD="+FarmDatabaseUserNamePassword);
+		WriteLine (nvFileSelectConnectHandle, psqlExe+" -d "+FarmDatabaseName+" -p "+FarmDatabasePort+" -A -t -f "+TARGETDIR+"SelectQuery.txt -h "+FarmDatabaseHost+" -o "+TARGETDIR+"SelectQueryOutput.txt -U "+FarmDatabaseUserName);
+    CloseFile (nvFileSelectConnectHandle);
+    
+// Create the lists for buttons and descriptions. 
+Disable (BACKBUTTON); 
+Disable (NEXTBUTTON); 
+
+    listButtons = ListCreate (STRINGLIST); 
+    listDescription = ListCreate (STRINGLIST);
+    
+    ListAddString (listButtons, "@12001;1;255,0,255", AFTER); 
+    ListAddString (listButtons, "@12002;1;255,0,255", AFTER);
+    
+    ListAddString (listDescription, "Update Single Company\nThis option will allow you to select a SINGLE company to update", AFTER); 
+    ListAddString (listDescription, "Update Whole App Server\nThis option will allow you to update ALL companies on a single App Server", AFTER); 
+
+ nCaseSelectResult = SdOptionsButtons ("Select Update Type", "Please select the type of update you want to do", listButtons, listDescription); 
+ 
+ switch (nCaseSelectResult) 
+        case 101: 
+            	OpenFileMode(FILE_MODE_APPEND);
+					CreateFile(nvFileSelectQueryHandle, TARGETDIR, "SelectQuery.txt");
+					WriteLine (nvFileSelectQueryHandle, "select c.short_name "+
+											 "from prohire_farm.company c "+
+											 "where c.enabled = 'TRUE' "+
+											 "order by c.short_name asc;");     
+				CloseFile (nvFileSelectQueryHandle);
+		
+		case 102: 
+               	OpenFileMode(FILE_MODE_APPEND);
+					CreateFile(nvFileSelectQueryHandle, TARGETDIR, "SelectQuery.txt");
+					WriteLine (nvFileSelectQueryHandle, "select ars.name "+
+											 "from prohire_farm.agent_running_state ars "+
+											 "where ars.enabled = 'TRUE' "+
+											 "order by ars.name asc;");
+					CloseFile (nvFileSelectQueryHandle);
+endswitch; 
+Enable(NEXTBUTTON); 
+
+if (LaunchAppAndWait (TARGETDIR+"SelectQueryConnect.bat", "", WAIT) <0) then
+	MessageBox("Connect to ProhireFarm database FAILED.\nCheck the following files:\n"+TARGETDIR+"SelectQuery.txt\n"+TARGETDIR+"SelectQueryConnect.bat...Exiting", SEVERE);
+	exit;
+endif;
+
+    // Destroy the lists. 
+    ListDestroy (listButtons); 
+    ListDestroy (listDescription);
+
+//*********************************************************************************************************
+//								UPDATE SINGLE COMPANY - 101
+//********************************************************************************************************* 
+
+//LIST OUT THE COMPANY NAME NAMES INTO THE CUSTOM DIALOG
+if nCaseSelectResult = 101 then
+	listCompanyNameList = ListCreate (STRINGLIST); 
+		OpenFileMode (FILE_MODE_NORMAL);
+			OpenFile (nvSelectQueryOuputFileHandle, TARGETDIR, "SelectQueryOutput.txt");
+				while (GetLine (nvSelectQueryOuputFileHandle, svCompanyNames) = 0)
+					ListAddString (listCompanyNameList, svCompanyNames, AFTER); 
+				endwhile;
+			CloseFile (nvSelectQueryOuputFileHandle);    
+     
+CompanySelectCustomDialog:     
+ szDialogName = "CompanyListDialog";
+         EzDefineDialog(szDialogName, ISUSER, szDialogName, 0);
+		    bDone = FALSE; 
+    		bSelected = FALSE;
+				repeat 
+					nControl = WaitOnDialog(szDialogName);
+						switch (nControl)
+							case DLG_CLOSE: 
+                				Do (EXIT);
+            				case DLG_ERR: 
+                				MessageBox ("Unable to display dialog. Setup exiting.", SEVERE);
+                				WriteProfString (Log_File, SECTION, "SHOW CUSTOM DIALOG", KEY_VALUE_FAILED);  
+                				exit; 
+							case DLG_INIT:
+								hwndDlg = CmdGetHwndDlg(szDialogName);
+								CtrlSetList (szDialogName, RES_DIALOG_LISTBOX, listCompanyNameList);
+							case RES_DIALOG_LISTBOX:
+								nSubCommand = CtrlGetSubCommand (szDialogName);
+								if (nSubCommand = LISTBOX_SELECT) || (nSubCommand = LISTBOX_ENTER)  then 
+                    				CtrlGetCurSel (szDialogName, RES_DIALOG_LISTBOX, svCompanyName);
+   			   	 				endif;
+   			   	 				WriteProfString (Log_File, SECTION, "SHOW CUSTOM DIALOG", KEY_VALUE_PASSED);     
+							case RES_PBUT_CANCEL: 
+       		         			Do (EXIT); 
+							case RES_PBUT_NEXT:
+			      				CtrlGetCurSel (szDialogName, RES_DIALOG_LISTBOX, svCompanyName);
+			      				WriteProfString (Log_File, SECTION, "GET SELECTED COMPANY NAME", KEY_VALUE_PASSED);
+			      				WriteProfString (Log_File, SECTION, "COMPANY TO UPDATE", svCompanyName); 
+			    				bSelected = TRUE; 
+                				bDone = TRUE;
+                				//REPLACE {1} WITH svCompanyName SO WE KNOW WHERE THE FILE SERVER & PROHIRE CLIENT PATH
+                				 _StrReplace (svFileServerPathReturnLine, "{1}", svCompanyName, glOccurrences, 1);
+								EndDialog (szDialogName);
+								ReleaseDialog (szDialogName);
+							case RES_PBUT_BACK: 
+       				         bDone = TRUE; 
+       				         EndDialog (szDialogName);
+							 ReleaseDialog (szDialogName);
+						endswitch;
+    			until bDone;
+
+if bSelected then
+EndDialog (szDialogName);
+ReleaseDialog (szDialogName);
+	if (AskYesNo("You have selected to update: "+svCompanyName+" to version "+svProhireServerVersionNumber+"\n\nClick 'YES' to continue.\n\nClick 'NO' to select another company", YES) = NO) then
+		goto CompanySelectCustomDialog;
+endif;
+ endif;
+ 
+EndDialog (szDialogName);
+ReleaseDialog (szDialogName);
+
+//*********************************************************************************************************		
+//GET THE c.port, ars.name, C.app_server_version FOR THE SELECTED COMPANY                                   
+//*********************************************************************************************************	
+OpenFileMode(FILE_MODE_APPEND);
+			CreateFile(nvFileSelectQueryHandle, TARGETDIR, "SelectGetCompanyPortNumbersQuery.txt");
+			WriteLine (nvFileSelectQueryHandle, "select c.port, ars.name, C.app_server_version, C.pin_no "+
+												"from prohire_farm.company c "+
+												"INNER JOIN prohire_farm.agent_running_state ARS ON (C.locked_to_agent = ars.agent_id) "+
+											    "where C.short_name = '"+svCompanyName+"'"+
+											    "ORDER BY C.short_name ASC;");     
+CloseFile (nvFileSelectQueryHandle);
+
+OpenFileMode(FILE_MODE_APPEND);
+	CreateFile(nvFileSelectConnectHandle, TARGETDIR, "SelectQueryConnect.bat");
+	WriteLine (nvFileSelectConnectHandle, "SET PGPASSWORD="+FarmDatabaseUserNamePassword);
+	WriteLine (nvFileSelectConnectHandle, psqlExe+" -d "+FarmDatabaseName+" -p "+FarmDatabasePort+" -A -t -f "+TARGETDIR+"SelectGetCompanyPortNumbersQuery.txt -h "+FarmDatabaseHost+" -o "+TARGETDIR+"SelectGetCompanyPortNumbersQueryOutput.txt -U "+FarmDatabaseUserName);
+CloseFile (nvFileSelectConnectHandle);
+
+if (LaunchAppAndWait (TARGETDIR+"SelectQueryConnect.bat", "", WAIT) <0) then
+	MessageBox("RUN SelectGetCompanyPortNumbersQuery.txt FAILED.\nCheck the following files:\n"+TARGETDIR+"SelectQuery.txt\n"+TARGETDIR+"SelectQueryConnect.bat...Exiting", SEVERE);
+	WriteProfString (Log_File, SECTION, "RUN SelectGetCompanyPortNumbersQuery.txt", KEY_VALUE_FAILED);
+	exit;
+else
+	WriteProfString (Log_File, SECTION, "RUN SelectGetCompanyPortNumbersQuery.txt", KEY_VALUE_PASSED);	
+endif;
+
+listPortNumbers = ListCreate (STRINGLIST);
+
+OpenFileMode (FILE_MODE_NORMAL);
+	OpenFile (nvFileSelectQueryOuputHandle, TARGETDIR, "SelectGetCompanyPortNumbersQueryOutput.txt");
+		GetLine (nvFileSelectQueryOuputHandle, svLine);
+			StrGetTokens (listPortNumbers, svLine, "|");
+				//WRITE THE LIST A FILE
+				if (ListWriteToFile (listPortNumbers, TARGETDIR+"listPortNumbers.txt") < 0) then
+					MessageBox("Could not create file: "+TARGETDIR+"listPortNumbers.txt...Exiting", SEVERE);
+					WriteProfString (Log_File, SECTION, "CREATE FILE: "+TARGETDIR+"listPortNumbers.txt", KEY_VALUE_FAILED);
+					exit;
+				else
+				 	WriteProfString (Log_File, SECTION, "CREATE FILE: "+TARGETDIR+"listPortNumbers.txt", KEY_VALUE_PASSED);
+				endif;
+	CloseFile (nvFileSelectQueryOuputHandle);
+	
+//GET THE ITEMS INTO VARIABLES
+ListGetFirstString(listPortNumbers, svServerPortNumber); 	
+ListGetNextString(listPortNumbers, svAppServerName);
+ListGetNextString(listPortNumbers, svAppServerVersion);
+ListGetNextString(listPortNumbers, svPinNumber);
+_StrStripTrailing (svAppServerVersion, " "); //HAS SPACES IN THE DATABASE SO STRIP THEM OUT
+
+//*********************************************************************************************************
+//							KILL APP SERVER
+//*********************************************************************************************************
+if (LaunchAppAndWait (CURL_EXE, HTTPHeaderString+"KillProcess?port="+svServerPortNumber+" -o "+TARGETDIR+"KillProcessResults.txt", WAIT) <0) then
+	MessageBox("Launch CURL Failed for KillProcess",INFORMATION);
+	exit;
+endif;		        
+
+//*********************************************************************************************************
+//							CHECK IS APP SERVER DOWN
+//*********************************************************************************************************
+if (LaunchAppAndWait (CURL_EXE, HTTPHeaderString+"IsProhireRunning?port="+svServerPortNumber+" -o "+TARGETDIR+"IsProhireRunningResults.txt", WAIT) <0) then
+	MessageBox("Launch CURL Failed for IsProhireRunning",INFORMATION);
+	exit;
+endif;
+
+//CHECK TARGETDIR+"IsProhireRunningResults.txt
+OpenFileMode (FILE_MODE_NORMAL); 
+OpenFile (nvIsProhireRunningFileHandle, TARGETDIR, "IsProhireRunningResults.txt" ); 
+	if (GetLine (nvIsProhireRunningFileHandle, svIsProhireRunningResultsLine) < 0) then
+	 MessageBox("CHECKING "+TARGETDIR+"IsProhireRunningResults.txt FAILED...exiting ",INFORMATION);
+	 exit;
+	  else if (svIsProhireRunningResultsLine) = 'NO' then
+		//SHOW NOTHING
+	  else 
+	   MessageBox("server NOT down...exiting ",INFORMATION);
+	   exit;
+	endif;
+		endif;
+
+//*********************************************************************************************************   
+//CREATE CHANGE APP SERVER PORT NUMBER BATCH FILE                                                          
+//*********************************************************************************************************
+	OpenFileMode(FILE_MODE_APPEND);
+		CreateFile(nvFileUpdateConnectHandle, TARGETDIR, "UpdateQueryChangeServerPortNumber.bat");
+			WriteLine (nvFileUpdateConnectHandle, "SET PGPASSWORD="+FarmDatabaseUserNamePassword);
+			WriteLine (nvFileUpdateConnectHandle, psqlExe+" -d "+FarmDatabaseName+" -p "+FarmDatabasePort+" -A -t -f "+TARGETDIR+"UpdateQueryChangeServerPortNumber.txt -h "+FarmDatabaseHost+" -o "+TARGETDIR+"UpdateQueryChangeServerPortNumberOutput.txt -U "+FarmDatabaseUserName);
+    CloseFile (nvFileUpdateConnectHandle);
+    
+	OpenFileMode(FILE_MODE_APPEND);
+		CreateFile(nvFileUpdateQueryHandle, TARGETDIR, "UpdateQueryChangeServerPortNumber.txt");
+			WriteLine (nvFileUpdateQueryHandle, "update prohire_farm.company set port = '"+svServerPortNumber+"0' where short_name = '"+svCompanyName+"' ");     
+		CloseFile (nvFileUpdateQueryHandle);
+
+//RUN UpdateQueryChangeServerPortNumber.bat 		
+if (LaunchAppAndWait (TARGETDIR+"UpdateQueryChangeServerPortNumber.bat", "", WAIT) <0) then
+	MessageBox("Unable to run "+TARGETDIR+"UpdateQueryChangeServerPortNumber.bat...Existing ",SEVERE);
+	WriteProfString (Log_File, SECTION, "LUNCH "+TARGETDIR+"UpdateQueryChangeServerPortNumber", KEY_VALUE_FAILED);           
+	exit;
+else
+	WriteProfString (Log_File, SECTION, "LUNCH "+TARGETDIR+"UpdateQueryChangeServerPortNumber", KEY_VALUE_PASSED);	
+endif;
+
+//*********************************************************************************************************
+//BACKUP THE DATABASE                                                                                      
+//*********************************************************************************************************
+//_StrReplace (svFirebirdDBPathReturnLine, "{0}:", "\\\\"+svAppServerName+"\\", glOccurrences, 1);
+_StrReplace (svFirebirdDBPathReturnLine, "{0}:", " ", glOccurrences, 1);
+//_StrReplace (svFirebirdDBPathReturnLine, ":", "$", glOccurrences, 1);  
+_StrReplace (svFirebirdDBPathReturnLine, "{1}", svCompanyName, glOccurrences, 1);
+_StrStripLeading (svFirebirdDBPathReturnLine, " ");
+_StrStripTrailing (svFirebirdDBPathReturnLine, " ");
+		if CopyFile (DATABASE_FILE_SINGLE_COMPANY, DATABASE_FILE_SINGLE_COMPANY_BACKUP) < 0 then
+  		 MessageBox("Database Backup failed\n\nFrom:\n\n"+DATABASE_FILE_SINGLE_COMPANY+"\n\nTo:\n\n"+DATABASE_FILE_SINGLE_COMPANY_BACKUP+" ...Existing ",SEVERE);
+    	 exit;
+    	endif;
+			//CHECK DATABASE HAS BACKED UP
+			nDatabaseBackupResult = Is (FILE_EXISTS, DATABASE_FILE_SINGLE_COMPANY_BACKUP);
+			 if (nDatabaseBackupResult = FALSE) then
+			  MessageBox("Checking\n"+DATABASE_FILE_SINGLE_COMPANY_BACKUP+"\nDatabase Backup File Exists Failed...Existing ",SEVERE);
+			  exit;
+			 endif;
+			 	//DELETE LOG & COMPANIES FILE
+				DeleteFile (MultiDBUpdaterLogFile);
+				DeleteFile (MultiDBUpdaterCompaniesCSV);
+					//RECREATE COMPANIES.CSV FILE - BUT CHANGE THE svFirebirdDBPathReturnLine STRING TO <APP_SERVER>:<DB_PATH>
+					//THIS IS NEEDED AS MultiDBUpdaterEXE CHANGES THE PATH TO "\\\\"+svAppServerName+"\\f$\\CompanyData\\"+svCompanyName+"\\Database\\Prohire.fdb 
+					_StrReplace (svFirebirdDBPathReturnLine, "\\\\"+svAppServerName+"\\", svAppServerName+":", glOccurrences, 1);
+					_StrReplace (svFirebirdDBPathReturnLine, svFirebirdDBPathDriveLetter+"$", svFirebirdDBPathDriveLetter+":", glOccurrences, 1);
+					OpenFileMode(FILE_MODE_APPEND);
+						CreateFile(nvMultiDbUpdaterCSVFileHandle, svMultiDBUpdaterPathReturnLine, "companies.csv");
+						WriteLine (nvMultiDbUpdaterCSVFileHandle, svCompanyName+",YES,EVERY,"+DATABASE_FILE_SINGLE_COMPANY);
+					//	WriteLine (nvMultiDbUpdaterCSVFileHandle, svCompanyName+",YES,EVERY,"+svFirebirdDBPathReturnLine);
+					CloseFile (nvMultiDbUpdaterCSVFileHandle);
+					 //CHANGE THE AUTORUN=0 TO AUTORUN=1 & THEN BACK TO AUTORUN=0 AS DJS WANTS THIS LEFT AS 0
+					  if (ReplaceProfString (MultiDBUpdaterIniFile, "MAIN", "AUTORUN", "0", "1") <0)  then
+					   MessageBox("Could not change AUTORUN=0 to AUTORUN=1 in "+MultiDBUpdaterIniFile, INFORMATION);
+					  endif;
+						//RUN MultiDBUpdaterEXE 
+						if (LaunchAppAndWait (MultiDBUpdaterEXE, "", WAIT) < 0) then
+	 					 MessageBox("Unable to run "+MultiDBUpdaterEXE+"...exiting", SEVERE);
+	 					 WriteProfString (Log_File, SECTION, "LUNCH "+MultiDBUpdaterEXE, KEY_VALUE_FAILED);	
+     					 exit;	 
+						endif;
+							//CHECK THE LOG MultiDBUpdaterEXE LOG FILE FOR ANY ERROR
+							if (FileGrep (MultiDBUpdaterLogFile, "***** ERROR ******", svMultiDBUpdaterErrorReturnLine, nvMultiDBUpdaterErrorLineNumber, RESTART) = 0) then
+								MessageBox("Scripts Update Error:\n\nGo to "+MultiDBUpdaterLogFile+"\n\nTo see the actual error and failed script number...exiting", SEVERE); 
+								//CHANGE APP SERVER PORT NUMBER BACK TO ORIGINAL
+								OpenFileMode(FILE_MODE_APPEND);
+									CreateFile(nvFileUpdateQueryHandle, TARGETDIR, "UpdateQueryChangeServerPortNumber.txt");
+									WriteLine (nvFileUpdateQueryHandle, "update prohire_farm.company set port = '"+svServerPortNumber+"' where short_name = '"+svCompanyName+"' ");     
+								CloseFile (nvFileUpdateQueryHandle);
+								//RUN UpdateQueryChangeServerPortNumber.bat 		
+								if (LaunchAppAndWait (TARGETDIR+"UpdateQueryChangeServerPortNumber.bat", "", WAIT) <0) then
+									MessageBox("Unable to run "+TARGETDIR+"UpdateQueryChangeServerPortNumber.bat...Existing ",SEVERE);
+									exit;
+								endif;
+ 							exit;
+							endif;
+							//CHANGE THE APP SERVER PORT NUMBER BACK TO ORIGINAL
+								OpenFileMode(FILE_MODE_APPEND);
+									CreateFile(nvFileUpdateQueryHandle, TARGETDIR, "UpdateQueryChangeServerPortNumber.txt");
+									WriteLine (nvFileUpdateQueryHandle, "update prohire_farm.company set port = '"+svServerPortNumber+"' where short_name = '"+svCompanyName+"' ");     
+								CloseFile (nvFileUpdateQueryHandle);
+								//RUN UpdateQueryChangeServerPortNumber.bat 		
+								if (LaunchAppAndWait (TARGETDIR+"UpdateQueryChangeServerPortNumber.bat", "", WAIT) <0) then
+									MessageBox("Unable to run "+TARGETDIR+"UpdateQueryChangeServerPortNumber.bat...Existing ",SEVERE);
+									exit;
+								endif;	
+							
+//CHANGE THE AUTORUN=1 TO AUTORUN=0
+if (ReplaceProfString (MultiDBUpdaterIniFile, "MAIN", "AUTORUN", "1", "0") <0)  then
+	 MessageBox("Could not change AUTORUN=1 to AUTORUN=0 in "+MultiDBUpdaterIniFile, INFORMATION);
+ endif;							
+
+//*********************************************************************************************************							   
+//CHANGE APP SERVER PORT NUMBER BACK TO ORIGINAL                                                           
+//*********************************************************************************************************
+	//RE-CREATE UpdateQueryChangeServerPortNumber.txt SO THAT IT HAS THE THE ORIGINAL PORT NUMBER
+	OpenFileMode(FILE_MODE_APPEND);
+		CreateFile(nvFileUpdateQueryHandle, TARGETDIR, "UpdateQueryChangeServerPortNumber.txt");
+			WriteLine (nvFileUpdateQueryHandle, "update prohire_farm.company set port = '"+svServerPortNumber+"' where short_name = '"+svCompanyName+"' ");     
+		CloseFile (nvFileUpdateQueryHandle);
+
+//RUN UpdateQueryChangeServerPortNumber.bat 		
+if (LaunchAppAndWait (TARGETDIR+"UpdateQueryChangeServerPortNumber.bat", "", WAIT) <0) then
+	MessageBox("Unable to run "+TARGETDIR+"UpdateQueryChangeServerPortNumber.bat...Existing ",SEVERE);         
+	exit;
+endif;							   
+
+//*********************************************************************************************************
+//UPDATE FARM DB TO NEW PROHIRE SERVER VERSION NUMBER                                                      
+//*********************************************************************************************************
+OpenFileMode(FILE_MODE_APPEND);
+	CreateFile(nvFileUpdateConnectHandle, TARGETDIR, "UpdateQueryChangeServerVersionNumber.bat");
+		WriteLine (nvFileUpdateConnectHandle, "SET PGPASSWORD="+FarmDatabaseUserNamePassword);
+		WriteLine (nvFileUpdateConnectHandle, psqlExe+" -d "+FarmDatabaseName+" -p "+FarmDatabasePort+" -A -t -f "+TARGETDIR+"UpdateQueryChangeServerVersionNumber.txt -h "+FarmDatabaseHost+" -o "+TARGETDIR+"UpdateQueryChangeServerVersionNumberOutput.txt -U "+FarmDatabaseUserName);
+CloseFile (nvFileUpdateConnectHandle);
+
+OpenFileMode(FILE_MODE_APPEND);
+	CreateFile(nvFileUpdateQueryHandle, TARGETDIR, "UpdateQueryChangeServerVersionNumber.txt");
+		WriteLine (nvFileUpdateQueryHandle, "update prohire_farm.company set app_server_version = '"+svProhireServerVersionNumber+"', min_client_version_no = '"+svProhireServerVersionNumber+"' where short_name = '"+svCompanyName+"' ");
+CloseFile (nvFileUpdateQueryHandle);
+
+if (LaunchAppAndWait (TARGETDIR+"UpdateQueryChangeServerVersionNumber.bat", "", WAIT) <0) then
+	MessageBox("Unable to run "+TARGETDIR+"UpdateQueryChangeServerVersionNumber.bat...Existing ",SEVERE);
+	exit;
+endif;
+
+//*********************************************************************************************************
+//INSERT NEW RECORD INTO FARM DB min_client_version_no TABLE                                               
+//*********************************************************************************************************
+OpenFileMode(FILE_MODE_APPEND);
+	CreateFile(nvFileInsertConnectHandle, TARGETDIR, "InsertQueryMinClientVersionNo.bat");
+		WriteLine (nvFileInsertConnectHandle, "SET PGPASSWORD="+FarmDatabaseUserNamePassword);
+		WriteLine (nvFileInsertConnectHandle, psqlExe+" -d "+FarmDatabaseName+" -p "+FarmDatabasePort+" -A -t -f "+TARGETDIR+"InsertQueryMinClientVersionNo.txt -h "+FarmDatabaseHost+" -o "+TARGETDIR+"InsertQueryMinClientVersionNoOutput.txt -U "+FarmDatabaseUserName);
+CloseFile (nvFileInsertConnectHandle);
+
+OpenFileMode(FILE_MODE_APPEND);
+	CreateFile(nvFileInsertQueryHandle, TARGETDIR, "InsertQueryMinClientVersionNo.txt");
+		WriteLine (nvFileInsertQueryHandle, "INSERT INTO prohire_farm.min_client_version_no (min_client_version_no, url)"+
+		 									"VALUES"+
+		 									"('"+svProhireServerVersionNumber+"','https://secure.tripoint.co.uk/Prohire/ProhireClients/"+svProhireServerVersionNumber+"/ProhireClient.exe');");     
+CloseFile (nvFileInsertQueryHandle);
+
+if (LaunchAppAndWait (TARGETDIR+"InsertQueryMinClientVersionNo.bat", "", WAIT) <0) then
+	MessageBox("Unable to run "+TARGETDIR+"InsertQueryMinClientVersionNo.bat...Existing ",SEVERE);
+	WriteProfString (Log_File, SECTION, "LUNCH "+TARGETDIR+"InsertQueryMinClientVersionNo.bat", KEY_VALUE_FAILED);           
+	exit;
+else
+	WriteProfString (Log_File, SECTION, "LUNCH "+TARGETDIR+"InsertQueryMinClientVersionNo.bat", KEY_VALUE_PASSED); 
+endif;
+
+//*********************************************************************************************************
+// COPY ProhireClient TO IIS (PROWEB) SERVER                                                               
+//*********************************************************************************************************
+nProhireClientExistsURLFolder = Is (FILE_EXISTS, PROHIRE_CLIENT_PATH_FOR_URL_LINK);
+	if (nProhireClientExistsURLFolder = FALSE) then
+		if (CopyFile (svUpdateFolder+"\\ProhireClient.exe", PROHIRE_CLIENT_PATH_FOR_URL_LINK) < 0) then
+			MessageBox("Unable to copy "+svUpdateFolder+"\\ProhireClient.exe"+" TO "+PROHIRE_CLIENT_PATH_FOR_URL_LINK, SEVERE);
+		endif;
+	endif;
+
+//*********************************************************************************************************
+//COPY TO SERVER IMAGES FOLDER                                                                             
+//*********************************************************************************************************
+nServerImagesFolderExistsResult  = Is (PATH_EXISTS, svRepositoryRootReturnLine);
+if (nServerImagesFolderExistsResult = FALSE) then
+	WriteProfString (Log_File, SECTION, "PATH "+svRepositoryRootReturnLine+" EXISTS", KEY_VALUE_NO);  
+		if CopyFile (svUpdateFolder ^ "ProhireServer.exe", svRepositoryRootReturnLine ^ "ProhireServer.exe") < 0 then
+			MessageBox("Unable to copy to\n "+svRepositoryRootReturnLine+"\n...Existing ",SEVERE);
+			exit;
+		endif;		
+endif;	
+
+//*********************************************************************************************************
+// START UP THE NEW APP SERVER                                                                             
+//*********************************************************************************************************
+if (LaunchAppAndWait (CURL_EXE, HTTPHeaderString+"LaunchServerForPort?port="+svServerPortNumber+" -o "+TARGETDIR+"LaunchServerForPortResults.txt", WAIT) <0) then
+	MessageBox("Launch CURL Failed for LaunchServerForPort",INFORMATION);
+	exit;	
+endif;
+
+//*********************************************************************************************************
+//							CHECK IS APP SERVER UP
+//*********************************************************************************************************
+Delay (5);
+
+if (LaunchAppAndWait (CURL_EXE, HTTPHeaderString+"IsProhireRunning?port="+svServerPortNumber+" -o "+TARGETDIR+"IsProhireRunningAfterUpdateResults.txt", WAIT) <0) then
+	MessageBox("Launch CURL Failed for IsProhireRunning",INFORMATION);
+	WriteProfString (Log_File, SECTION, "LUNCH "+CURL_EXE+" for IsProhireRunning", KEY_VALUE_FAILED);
+	exit;
+else
+	WriteProfString (Log_File, SECTION, "LUNCH "+CURL_EXE+" for IsProhireRunning", KEY_VALUE_PASSED);	
+endif;
+
+//CHECK TARGETDIR+"IsProhireRunningResults.txt
+OpenFileMode (FILE_MODE_NORMAL); 
+OpenFile (nvIsProhireRunningFileHandle, TARGETDIR, "IsProhireRunningAfterUpdateResults.txt" ); 
+	if (GetLine (nvIsProhireRunningFileHandle, svIsProhireRunningAfterUpdateResultsLine) < 0) then
+	 MessageBox("CHECKING "+TARGETDIR+"IsProhireRunningAfterUpdateResults.txt FAILED",INFORMATION);
+		else if (svIsProhireRunningAfterUpdateResultsLine) = 'YES' then
+	  else 
+	   MessageBox("Prohire Server NOT Up",INFORMATION);
+	endif;
+		endif;	 				
+		
+//ENDIF FOR nCaseSelectResult = 101
+endif;
+	
+//*********************************************************************************************************	
+//*********************************************************************************************************
+//								UPDATE WHOLE APP SERVER - 102
+//********************************************************************************************************* 
+//*********************************************************************************************************
+
+//LIST OUT THE APP SERVERS INTO THE CUSTOM DIALOG
+if nCaseSelectResult = 102 then
+	listAppServersList = ListCreate (STRINGLIST); 
+		OpenFileMode (FILE_MODE_NORMAL);
+			OpenFile (nvSelectQueryOuputFileHandle, TARGETDIR, "SelectQueryOutput.txt");
+				while (GetLine (nvSelectQueryOuputFileHandle, svAppServerName) = 0)
+					ListAddString (listAppServersList, svAppServerName, AFTER); 
+				endwhile;
+		CloseFile (nvSelectQueryOuputFileHandle);    
+     
+AppServersCustomDialog:     
+ szDialogName = "CompanyListDialog"; //CAN USE THE SAME CUSTOM DIALOG
+         EzDefineDialog(szDialogName, ISUSER, szDialogName, 0);
+		    bDone = FALSE; 
+    		bSelected = FALSE;
+				repeat 
+					nControl = WaitOnDialog(szDialogName);
+						switch (nControl)
+							case DLG_CLOSE: 
+                				Do (EXIT);
+            				case DLG_ERR: 
+                				MessageBox ("Unable to display dialog. Setup canceled.", SEVERE); 
+                				exit; 
+							case DLG_INIT:
+								hwndDlg = CmdGetHwndDlg(szDialogName);
+								CtrlSetList (szDialogName, RES_DIALOG_LISTBOX, listAppServersList);
+							case RES_DIALOG_LISTBOX:
+								nSubCommand = CtrlGetSubCommand (szDialogName);
+								if (nSubCommand = LISTBOX_SELECT) then 
+                    				CtrlGetCurSel (szDialogName, RES_DIALOG_LISTBOX, svAppServerName);
+   			   	 				endif;     
+							case RES_PBUT_CANCEL: 
+       		         			Do (EXIT); 
+							case RES_PBUT_NEXT:
+			      				CtrlGetCurSel (szDialogName, RES_DIALOG_LISTBOX, svAppServerName);
+			    				bSelected = TRUE; 
+                				bDone = TRUE;
+							case RES_PBUT_BACK: 
+       				         bDone = TRUE; 
+						endswitch;
+    			until bDone; 
+    
+if bSelected then 
+     if (AskYesNo("You have selected to update App Server: "+svAppServerName+"\n\nClick 'YES' to continue.\n\nClick 'NO' to select another App Server", YES) = NO) then
+		goto AppServersCustomDialog;
+endif;
+	endif;
+	
+if (svComputerName != svAppServerName) then
+  MessageBox("You MUST to run this option on "+svAppServerName+"...Exiting",SEVERE);
+  exit;
+endif;	
+
+EndDialog (szDialogName);
+	ReleaseDialog (szDialogName);
+
+//RUN QUERY AGAINST THE SELECTED APP SERVER TO GET LIST OF ACTIVE COMPANIES & A QUERY TO GET THE PORT NUMBERS	                                 
+		OpenFileMode(FILE_MODE_APPEND);
+			CreateFile(nvFileSelectQueryHandle, TARGETDIR, "SelectGetCompanyNamesQuery.txt");
+			WriteLine (nvFileSelectQueryHandle, "SELECT c.short_name "+
+												"FROM prohire_farm.company C, prohire_farm.agent_running_state A "+
+											 	"WHERE C.locked_to_agent = A.agent_id AND "+
+											 	"A.\"name\" = '"+svAppServerName+"' AND c.enabled = 'TRUE' "+
+											 	"and c.app_server_version <> '"+svProhireServerVersionNumber+"' "+
+											 	"ORDER BY C.short_name ASC;");     
+		CloseFile (nvFileSelectQueryHandle);
+
+		OpenFileMode(FILE_MODE_APPEND);
+			CreateFile(nvFileSelectConnectHandle, TARGETDIR, "SelectQueryConnect.bat");
+			WriteLine (nvFileSelectConnectHandle, "SET PGPASSWORD="+FarmDatabaseUserNamePassword);
+			WriteLine (nvFileSelectConnectHandle, psqlExe+" -d "+FarmDatabaseName+" -p "+FarmDatabasePort+" -A -t -f "+TARGETDIR+"SelectGetCompanyNamesQuery.txt -h "+FarmDatabaseHost+" -o "+TARGETDIR+"SelectGetCompanyNamesQueryOutput.txt -U "+FarmDatabaseUserName);
+    	CloseFile (nvFileSelectConnectHandle);
+
+	if (LaunchAppAndWait (TARGETDIR+"SelectQueryConnect.bat", "", WAIT) <0) then
+		MessageBox("Connect to ProhireFarm db FAILED.\nCheck the following files:\n"+TARGETDIR+"SelectQuery.txt\n"+TARGETDIR+"SelectQueryConnect.bat",SEVERE);
+		exit;
+	endif;		
+
+EndDialog (szDialogName);
+	ReleaseDialog (szDialogName);
+
+//*********************************************************************************************************   
+//CREATE CHANGE APP SERVER PORT NUMBER BATCH FILE SO IT READY FOR THE LOOP                                                          
+//*********************************************************************************************************
+	OpenFileMode(FILE_MODE_APPEND);
+		CreateFile(nvFileUpdateConnectHandle, TARGETDIR, "UpdateQueryChangeServerPortNumber.bat");
+			WriteLine (nvFileUpdateConnectHandle, "SET PGPASSWORD="+FarmDatabaseUserNamePassword);
+			WriteLine (nvFileUpdateConnectHandle, psqlExe+" -d "+FarmDatabaseName+" -p "+FarmDatabasePort+" -A -t -f "+TARGETDIR+"UpdateQueryChangeServerPortNumber.txt -h "+FarmDatabaseHost+" -o "+TARGETDIR+"UpdateQueryChangeServerPortNumberOutput.txt -U "+FarmDatabaseUserName);
+    CloseFile (nvFileUpdateConnectHandle);
+    
+//*********************************************************************************************************   		
+//CREATE THE UpdateQueryChangeServerVersionNumber.bat FILE SO IT READY FOR THE LOOP  
+//*********************************************************************************************************   
+OpenFileMode(FILE_MODE_APPEND);
+	CreateFile(nvFileUpdateConnectHandle, TARGETDIR, "UpdateQueryChangeServerVersionNumber.bat");
+		WriteLine (nvFileUpdateConnectHandle, "SET PGPASSWORD="+FarmDatabaseUserNamePassword);
+		WriteLine (nvFileUpdateConnectHandle, psqlExe+" -d "+FarmDatabaseName+" -p "+FarmDatabasePort+" -A -t -f "+TARGETDIR+"UpdateQueryChangeServerVersionNumber.txt -h "+FarmDatabaseHost+" -o "+TARGETDIR+"UpdateQueryChangeServerVersionNumberOutput.txt -U "+FarmDatabaseUserName);
+CloseFile (nvFileUpdateConnectHandle);
+
+//*********************************************************************************************************	
+//	START THE LOOP - IN THIS LOOP THE FOLLOWING WILL HAPPEN:
+//	1. OPEN THE SelectGetCompanyNamesQueryOutput.txt FILE
+//	2. ASK TO CONTINUE RUNNING AGAINST THE COMPANY
+//	3. BACKUP THE DATABASE & THEN CHECK THAT IT HAS BACKED UP
+//	4. CREATE THE companies.csv & WRITE THE LINE TO IT FOR MULTIDB UPDATER
+//	5. RUN DBUPDATER
+//	6. UPDATE FARM DATABSE TO COMPANIES NEW VERSION NUMBER
+//	7. COPY THE PROHIRE CLIENT TO THE COMPANIES PROHIREFILES FOLDER
+//	8. RESTART THE FILE SERVER
+//	9. CREATE THE ProhireWindow.txt THAT HAS THAT COMPANIES PIN IN & COPY TO THEIR PROHIREFILES FOLDER
+//  10. UPDATE THE FARM DATABASE TO COMPANIES NEW VERSION NUMBER 
+//*********************************************************************************************************	
+
+OpenFileMode (FILE_MODE_NORMAL);
+ OpenFile (nGetCompanyNamesQueryOutputFileHandle, TARGETDIR, "SelectGetCompanyNamesQueryOutput.txt");
+
+while (GetLine (nGetCompanyNamesQueryOutputFileHandle, svCompanyName) = 0);
+	//ASK IF TO CONTINUE TO NEXT COMPANY
+	if (AskYesNo("Run update on on '"+svCompanyName+"'?", YES) = YES) then
+//DELETE FILE(S) SO IT CAN BE RE-CREATED FOR THE NEXT COMPANY
+DeleteFile (TARGETDIR+"UpdateQueryChangeServerPortNumber.txt");
+DeleteFile (TARGETDIR+"SelectGetPinNumberQuery.txt");	
+DeleteFile (TARGETDIR+"SelectGetPinNumberQueryOutput.txt");  
+DeleteFile (TARGETDIR+"SelectQueryConnect.bat");
+DeleteFile (TARGETDIR+"SelectGetCompanyPortNumbersQuery.txt");
+DeleteFile (TARGETDIR+"SelectGetCompanyPortNumbersQueryOutput.txt");
+DeleteFile (MultiDBUpdaterLogFile);
+DeleteFile (MultiDBUpdaterCompaniesCSV);
+
+OpenFileMode(FILE_MODE_APPEND);
+	CreateFile(nvFileSelectConnectHandle, TARGETDIR, "SelectQueryConnect.bat");
+	WriteLine (nvFileSelectConnectHandle, "SET PGPASSWORD="+FarmDatabaseUserNamePassword);
+	WriteLine (nvFileSelectConnectHandle, psqlExe+" -d "+FarmDatabaseName+" -p "+FarmDatabasePort+" -A -t -f "+TARGETDIR+"SelectGetCompanyPortNumbersQuery.txt -h "+FarmDatabaseHost+" -o "+TARGETDIR+"SelectGetCompanyPortNumbersQueryOutput.txt -U "+FarmDatabaseUserName);
+CloseFile (nvFileSelectConnectHandle);
+
+OpenFileMode(FILE_MODE_APPEND);
+	CreateFile(nSelectGetCompanyPortNumbersQueryFileHandle, TARGETDIR, "SelectGetCompanyPortNumbersQuery.txt");
+	WriteLine (nSelectGetCompanyPortNumbersQueryFileHandle, "select c.port from prohire_farm.company c where C.short_name = '"+svCompanyName+"'");     
+CloseFile (nSelectGetCompanyPortNumbersQueryFileHandle);
+
+	if (LaunchAppAndWait (TARGETDIR+"SelectQueryConnect.bat", "", WAIT) <0) then
+		MessageBox("Connect to ProhireFarm db FAILED.\nCheck the following files:\n"+TARGETDIR+"SelectQuery.txt\n"+TARGETDIR+"SelectQueryConnect.bat",SEVERE);
+		exit;
+	endif;
+
+//KILL APP SERVER	
+OpenFileMode (FILE_MODE_NORMAL);
+ OpenFile (nGetCompanyPortNumbersQueryOutputFileHandle, TARGETDIR, "SelectGetCompanyPortNumbersQueryOutput.txt");
+
+while (GetLine (nGetCompanyPortNumbersQueryOutputFileHandle, svServerPortNumber) = 0);
+ 	if (LaunchAppAndWait (CURL_EXE, HTTPHeaderString+"KillProcess?port="+svServerPortNumber+" -o "+TARGETDIR+"KillProcessResults.txt", WAIT) <0) then
+		MessageBox("Launch Curl Failed!! ",SEVERE);
+		exit;
+	endif;
+endwhile;
+
+CloseFile (nGetCompanyPortNumbersQueryOutputFileHandle);
+
+		 	//CREATE THE UpdateQueryChangeServerPortNumber.txt FILE TO PUT A 0 AT THE END OF THE PROHIRE SERVER PORT NUMBER SO NO CLIENTS CAN CONNECT
+		 	OpenFileMode(FILE_MODE_APPEND); 
+				CreateFile(nvFileUpdateQueryHandle, TARGETDIR, "UpdateQueryChangeServerPortNumber.txt");
+				WriteLine (nvFileUpdateQueryHandle, "update prohire_farm.company set port = '"+svServerPortNumber+"0' where short_name = '"+svCompanyName+"' ");     
+			CloseFile (nvFileUpdateQueryHandle);
+		 	//RUN UpdateQueryChangeServerPortNumber.bat 		
+			if (LaunchAppAndWait (TARGETDIR+"UpdateQueryChangeServerPortNumber.bat", "", WAIT) <0) then
+				MessageBox("Unable to run "+TARGETDIR+"UpdateQueryChangeServerPortNumber.bat...Existing ",SEVERE);
+				exit;
+			endif;
+//BACKUP THE DATABASE 
+				//RECREATE COMPANIES.CSV FILE - BUT CHANGE THE svFirebirdDBPathReturnLine STRING TO <APP_SERVER>:<DB_PATH>
+				//THIS IS NEEDED AS MultiDBUpdaterEXE CHANGES THE PATH TO "\\\\"+svAppServerName+"\\f$\\CompanyData\\"+svCompanyName+"\\Database\\Prohire.fdb
+					//_StrReplace (svFirebirdDBPathReturnLine, "{0}:", "\\\\"+svAppServerName+"\\", glOccurrences, 1);
+					_StrReplace (svFirebirdDBPathReturnLine, "{0}:", " ", glOccurrences, 1);
+					//_StrReplace (svFirebirdDBPathReturnLine, ":", "$", glOccurrences, 1);  
+					_StrReplace (svFirebirdDBPathReturnLine, "{1}", svCompanyName, glOccurrences, 1);
+					_StrStripLeading (svFirebirdDBPathReturnLine, " ");
+					_StrStripTrailing (svFirebirdDBPathReturnLine, " "); 
+					//_StrReplace (svFirebirdDBPathReturnLine, "\\\\"+svAppServerName+"\\", svAppServerName+":", glOccurrences, 1);
+					//_StrReplace (svFirebirdDBPathReturnLine, svFirebirdDBPathDriveLetter+"$", svFirebirdDBPathDriveLetter+":", glOccurrences, 1);
+	/*	if CopyFile (DATABASE_FILE, DATABASE_FILE_BACKUP) < 0 then
+  		 MessageBox("Database Backup from:\n\n"+DATABASE_FILE+"\n\nTo:\n\n"+DATABASE_FILE_BACKUP+" Failed...Existing ",SEVERE);
+  		 	OpenFileMode(FILE_MODE_APPEND);
+				CreateFile(nvMultiDbUpdaterCSVFileHandle, svMultiDBUpdaterPathReturnLine, "companies.csv");
+				WriteLine (nvMultiDbUpdaterCSVFileHandle, svCompanyName+",YES,EVERY,"+DATABASE_FILE);
+			CloseFile (nvMultiDbUpdaterCSVFileHandle);
+			//CHANGE APP SERVER PORT NUMBER BACK TO ORIGINAL
+			OpenFileMode(FILE_MODE_APPEND);
+				CreateFile(nvFileUpdateQueryHandle, TARGETDIR, "UpdateQueryChangeServerPortNumber.txt");
+				WriteLine (nvFileUpdateQueryHandle, "update prohire_farm.company set port = '"+svServerPortNumber+"' where short_name = '"+svCompanyName+"' ");     
+			CloseFile (nvFileUpdateQueryHandle);
+			//RUN UpdateQueryChangeServerPortNumber.bat 		
+			if (LaunchAppAndWait (TARGETDIR+"UpdateQueryChangeServerPortNumber.bat", "", WAIT) <0) then
+				MessageBox("Unable to run "+TARGETDIR+"UpdateQueryChangeServerPortNumber.bat...Existing ",SEVERE);
+				exit;
+			endif;         
+    	// exit;
+		endif;
+			//CHECK DATABASE HAS BACKED UP 
+			nDatabaseBackupResult = Is (FILE_EXISTS, DATABASE_FILE_BACKUP);
+			 if (nDatabaseBackupResult = FALSE) then
+			  MessageBox("Checking\n"+DATABASE_FILE_BACKUP+"\nDatabase Backup File Exists Failed...Existing ",SEVERE);           
+			 // exit; 
+			 endif;    */
+					//RECREATE COMPANIES.CSV FILE
+					OpenFileMode(FILE_MODE_APPEND);
+						CreateFile(nvMultiDbUpdaterCSVFileHandle, svMultiDBUpdaterPathReturnLine, "companies.csv");
+						WriteLine (nvMultiDbUpdaterCSVFileHandle, svCompanyName+",YES,EVERY,"+DATABASE_FILE);
+					CloseFile (nvMultiDbUpdaterCSVFileHandle);
+					 //CHANGE THE AUTORUN=0 TO AUTORUN=1
+					  if (ReplaceProfString (MultiDBUpdaterIniFile, "MAIN", "AUTORUN", "0", "1") < 0)  then
+					   MessageBox("Could not change AUTORUN=0 to AUTORUN=1 in "+MultiDBUpdaterIniFile, INFORMATION);
+					  endif;
+						//RUN MultiDBUpdaterEXE 
+						if LaunchAppAndWait (MultiDBUpdaterEXE, "", WAIT) < 0 then
+	 					 MessageBox("Unable to run MultiDbUpdater...exiting", SEVERE);
+     					 exit;
+						endif;
+						 //CHANGE THE AUTORUN=1 TO AUTORUN=0 - DJS WANTS THIS LEFT AS 0
+						 if (ReplaceProfString (MultiDBUpdaterIniFile, "MAIN", "AUTORUN", "1", "0") < 0)  then
+					   		MessageBox("Could not change AUTORUN=1 to AUTORUN=0 in "+MultiDBUpdaterIniFile, INFORMATION);
+					 	 endif;
+							//CHECK THE LOG MultiDBUpdaterEXE LOG FILE FOR ANY ERROR
+							if (FileGrep (MultiDBUpdaterLogFile, "***** ERROR ******", svMultiDBUpdaterErrorReturnLine, nvMultiDBUpdaterErrorLineNumber, RESTART) = 0) then
+								MessageBox("Scripts Update Error:\n\nGo to "+MultiDBUpdaterLogFile+"\n\nTo see the actual error and failed script number...exiting", SEVERE); 
+								//CHANGE APP SERVER PORT NUMBER BACK TO ORIGINAL
+								OpenFileMode(FILE_MODE_APPEND);
+									CreateFile(nvFileUpdateQueryHandle, TARGETDIR, "UpdateQueryChangeServerPortNumber.txt");
+									WriteLine (nvFileUpdateQueryHandle, "update prohire_farm.company set port = '"+svServerPortNumber+"' where short_name = '"+svCompanyName+"' ");     
+								CloseFile (nvFileUpdateQueryHandle);
+								//RUN UpdateQueryChangeServerPortNumber.bat 		
+								if (LaunchAppAndWait (TARGETDIR+"UpdateQueryChangeServerPortNumber.bat", "", WAIT) <0) then
+									MessageBox("Unable to run "+TARGETDIR+"UpdateQueryChangeServerPortNumber.bat...Existing ",SEVERE);
+									exit;
+								endif;
+ 							exit;
+							endif;
+						    	//CREATE THE UPDATE SCRIPT FILE THAT CHANGES THE VERSION NUMBER & MIN CLIENT VERSION NUMBER
+								OpenFileMode(FILE_MODE_APPEND);
+									CreateFile(nvFileUpdateQueryHandle, TARGETDIR, "UpdateQueryChangeServerVersionNumber.txt");
+									WriteLine (nvFileUpdateQueryHandle, "update prohire_farm.company set app_server_version = '"+svProhireServerVersionNumber+"', min_client_version_no = '"+svProhireServerVersionNumber+"' where short_name = '"+svCompanyName+"' ");     
+								CloseFile (nvFileUpdateQueryHandle);
+									//RUN UpdateQueryChangeServerVersionNumber.bat
+									if (LaunchAppAndWait (TARGETDIR ^ "UpdateQueryChangeServerVersionNumber.bat", "", WAIT) <0) then
+										MessageBox("Unable to run "+TARGETDIR+"UpdateQueryChangeServerVersionNumber.bat...exiting",SEVERE);
+										exit;
+									endif;
+           							//CHANGE APP SERVER PORT NUMBER BACK TO ORIGINAL
+									OpenFileMode(FILE_MODE_APPEND);
+										CreateFile(nvFileUpdateQueryHandle, TARGETDIR, "UpdateQueryChangeServerPortNumber.txt");
+										WriteLine (nvFileUpdateQueryHandle, "update prohire_farm.company set port = '"+svServerPortNumber+"' where short_name = '"+svCompanyName+"' ");     
+									CloseFile (nvFileUpdateQueryHandle);
+									//RUN UpdateQueryChangeServerPortNumber.bat 		
+									if (LaunchAppAndWait (TARGETDIR+"UpdateQueryChangeServerPortNumber.bat", "", WAIT) <0) then
+										MessageBox("Unable to run "+TARGETDIR+"UpdateQueryChangeServerPortNumber.bat...Existing ",SEVERE);
+										exit;
+									endif;
+									//LAUNCH PROHIRE SERVER
+									if (LaunchAppAndWait (CURL_EXE, HTTPHeaderString+"LaunchServerForPort?port="+svServerPortNumber+" -o "+TARGETDIR+"LaunchServerForPortResults.txt", WAIT) <0) then
+										MessageBox("Launch CURL Failed for LaunchServerForPort",INFORMATION);
+										exit;	
+									endif;
+
+   				//PUT "{1}" BACK INTO svFirebirdDBPathReturnLine FOR NEXT LOOP
+				_StrReplace (svFirebirdDBPathReturnLine, svCompanyName, "{1}", glOccurrences, 1);
+				_StrReplace (svFileServerPathReturnLine, svCompanyName, "{1}", glOccurrences, 1);								
+	endif; //ENDIF FOR QUESTION
+endwhile; //END LOOP nGetCompanyNamesQueryOutputFileHandle
+
+CloseFile (nGetCompanyNamesQueryOutputFileHandle);
+
+//COPY TO SERVER IMAGES FOLDER
+nServerImagesFolderExistsResult  = Is (PATH_EXISTS, svRepositoryRootReturnLine);
+if (nServerImagesFolderExistsResult = FALSE) then  
+	if CopyFile (svUpdateFolder ^ "ProhireServer.exe", svRepositoryRootReturnLine ^ "ProhireServer.exe") < 0 then
+		MessageBox("Unable to copy to\n "+svRepositoryRootReturnLine+"\n...Existing ",SEVERE);           
+		exit;
+	endif;
+endif;
+
+//*********************************************************************************************************	
+//INSERT NEW RECORD INTO FARM DB min_client_version_no TABLE                                                
+//*********************************************************************************************************	
+//CREATE THE FILE
+OpenFileMode(FILE_MODE_APPEND);
+	CreateFile(nvFileInsertConnectHandle, TARGETDIR, "InsertQueryMinClientVersionNo.bat");
+		WriteLine (nvFileInsertConnectHandle, "SET PGPASSWORD="+FarmDatabaseUserNamePassword);
+		WriteLine (nvFileInsertConnectHandle, psqlExe+" -d "+FarmDatabaseName+" -p "+FarmDatabasePort+" -A -t -f "+TARGETDIR+"InsertQueryMinClientVersionNo.txt -h "+FarmDatabaseHost+" -o "+TARGETDIR+"InsertQueryMinClientVersionNoOutput.txt -U "+FarmDatabaseUserName);
+CloseFile (nvFileInsertConnectHandle);
+
+//WRITE THE QUERY FILE
+OpenFileMode(FILE_MODE_APPEND);
+	CreateFile(nvFileInsertQueryHandle, TARGETDIR, "InsertQueryMinClientVersionNo.txt");
+		WriteLine (nvFileInsertQueryHandle, "INSERT INTO prohire_farm.min_client_version_no (min_client_version_no, url)"+
+		 									"VALUES"+
+		 									"('"+svProhireServerVersionNumber+"','https://secure.tripoint.co.uk/Prohire/ProhireClients/"+svProhireServerVersionNumber+"/ProhireClient.exe');");     
+CloseFile (nvFileInsertQueryHandle);
+
+//RUN BATCH FILE
+if (LaunchAppAndWait (TARGETDIR+"InsertQueryMinClientVersionNo.bat", "", WAIT) <0) then
+	MessageBox("Unable to run "+TARGETDIR+"InsertQueryMinClientVersionNo.bat...Existing ",SEVERE);        
+	exit;
+endif;	
+
+//*********************************************************************************************************	
+// COPY ProhireClient TO IIS (PROWEB) SERVER                                                                
+//*********************************************************************************************************	
+nProhireClientExistsURLFolder = Is (FILE_EXISTS, PROHIRE_CLIENT_PATH_FOR_URL_LINK);
+	if (nProhireClientExistsURLFolder = FALSE) then
+		if (CopyFile (svUpdateFolder+"\\ProhireClient.exe", PROHIRE_CLIENT_PATH_FOR_URL_LINK) < 0) then
+			MessageBox("Unable to copy "+svUpdateFolder+"\\ProhireClient.exe"+" TO "+PROHIRE_CLIENT_PATH_FOR_URL_LINK, SEVERE);
+		endif;
+	endif;
+ 	
+//ENDIF FOR nCaseSelectResult = 102
+endif;  
+
+return 0;
+end;
